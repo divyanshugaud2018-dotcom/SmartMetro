@@ -74,6 +74,10 @@ export default function SettingsPage() {
   }
 
   async function enableBrowserNotes() {
+    if (!window.isSecureContext) {
+      setStatus("Notifications require HTTPS. Open the deployed HTTPS website, not a plain HTTP address.");
+      return;
+    }
     if (!("Notification" in window)) {
       setStatus("This browser does not support notifications.");
       return;
@@ -85,6 +89,11 @@ export default function SettingsPage() {
       await save({ ...prefs, browserNotifications: true });
     } else {
       await save({ ...prefs, browserNotifications: false });
+      setStatus(
+        result === "denied"
+          ? "Notifications are blocked in the browser or paused by the device. Allow Smart Metro Finder in site settings and try again."
+          : "Notification permission was not completed.",
+      );
     }
   }
 
@@ -186,7 +195,10 @@ export default function SettingsPage() {
             />
             <span>
               Browser notifications
-              <small>Permission: {permission}. Background delivery is not guaranteed on iOS or locked screens.</small>
+              <small>
+                Permission: {permission}. If Android shows “Paused due to Notification”, enable notifications for this
+                site in Android Settings. Background delivery is not guaranteed on iOS or locked screens.
+              </small>
             </span>
           </label>
         </section>

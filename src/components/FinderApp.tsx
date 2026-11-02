@@ -48,6 +48,9 @@ const DEFAULT_PREFS: AppPreferences = {
   mapProvider: "auto",
 };
 
+const MAX_INITIAL_LOCATION_ACCURACY_METERS = 5_000;
+const MAX_TRACKING_ACCURACY_METERS = 300;
+
 function hourKey(date = new Date()): string {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}-${date.getHours()}`;
 }
@@ -154,6 +157,13 @@ export default function FinderApp() {
     setGeoError(null);
 
     const applyPosition = (position: GeolocationPosition) => {
+        if (position.coords.accuracy > MAX_INITIAL_LOCATION_ACCURACY_METERS) {
+          setGeoBusy(false);
+          setGeoError(
+            `Location is too approximate (${Math.round(position.coords.accuracy / 10) * 10} m accuracy). Move to an open area, enable device location, then try again.`,
+          );
+          return;
+        }
         const next: UserLocation = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -322,7 +332,12 @@ export default function FinderApp() {
     if (!prefs.trackingEnabled) return;
     watchRef.current = navigator.geolocation.watchPosition(
       (position) => {
-        if (position.coords.accuracy > 75) return;
+        if (position.coords.accuracy > MAX_TRACKING_ACCURACY_METERS) {
+          setGeoError(
+            `Live location is approximate (${Math.round(position.coords.accuracy / 10) * 10} m accuracy). Nearby alerts remain paused until GPS improves.`,
+          );
+          return;
+        }
         const next: UserLocation = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
@@ -350,6 +365,7 @@ export default function FinderApp() {
 
   useEffect(() => {
     if (!prefs.trackingEnabled || !prefs.proximityAlerts || !user) return;
+    if (user.accuracy != null && user.accuracy > MAX_TRACKING_ACCURACY_METERS) return;
     const target =
       preferred ??
       (selected
@@ -540,7 +556,7 @@ export default function FinderApp() {
 
     journeyWatchRef.current = navigator.geolocation.watchPosition(
       (position) => {
-        if (position.coords.accuracy > 75) return;
+        if (position.coords.accuracy > MAX_TRACKING_ACCURACY_METERS) return;
         const current: [number, number] = [position.coords.latitude, position.coords.longitude];
         setUser({
           lat: current[0],
