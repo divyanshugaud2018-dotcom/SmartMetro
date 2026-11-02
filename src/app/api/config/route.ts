@@ -1,0 +1,13 @@
+import { NextResponse } from "next/server";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const googleMapsServer = Boolean(process.env.GOOGLE_MAPS_API_KEY);
+  const googleMapsClient = Boolean(process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
+  return NextResponse.json({
+    googleMapsClient,
+    googleMapsServer,
+    placesProvider: googleMapsServer ? "hybrid" : "openstreetmap",
+  });
+}
