@@ -33,6 +33,16 @@ NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
 
 Full setup steps are in the in-app **Setup & privacy** guide (`/guide`).
 
+## GitHub and Vercel deployment
+
+1. Import this repository in Vercel and connect the `main` branch.
+2. Add `DATABASE_URL`, `GOOGLE_MAPS_API_KEY`, and `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in the Vercel project settings.
+3. Create a hosted PostgreSQL database and run `npm run db:push` with its production URL.
+4. Add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as GitHub Actions repository secrets.
+5. Every push to `main` runs type checking and a production build. A successful push then deploys to Vercel.
+
+The workflow is [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). Once changes are committed and pushed, GitHub verifies them and deploys successful `main` builds to Vercel.
+
 ## Scripts
 
 ```bash
