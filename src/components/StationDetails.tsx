@@ -100,7 +100,7 @@ export default function StationDetails({
         Walking time is a routing estimate, not a train arrival. Station proximity does not mean a train is coming.
       </p>
       <div className="banner banner-info">
-        Need urgent help in India? Call <a href="tel:112"><strong>112</strong></a>. For official fares, routes, elevators, service changes, and crowd updates, check the operator's website below.
+        Need urgent help in India? Call <a href="tel:112"><strong>112</strong></a>. For official fares, routes, elevators, service changes, and crowd updates, check the operator&apos;s website below.
       </div>
 
       {route ? (
